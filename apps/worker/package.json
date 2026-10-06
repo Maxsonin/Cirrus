@@ -1,0 +1,23 @@
+{
+  "name": "worker",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev:chat": "tsx watch src/index.ts chat"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@cirrus/shared": "workspace:*",
+    "bullmq": "^6.3.10",
+    "dotenv": "^18.0.5",
+    "redis": "^6.3.0"
+  }
+}

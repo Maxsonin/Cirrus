@@ -1,8 +1,9 @@
 import express, { type Express } from 'express';
 import cors from 'cors';
 
-import apiRouter from './routes/index.js';
-import { env } from './config/env.js';
+import { env } from './config/env';
+import chatRouter from './modules/chat/chat.routes';
+import modelsRouter from './modules/models/models.routes';
 
 const app: Express = express();
 
@@ -12,6 +13,7 @@ app.use(
   }),
 );
 app.use(express.json());
-app.use(apiRouter);
+app.use(chatRouter);
+app.use(modelsRouter);
 
 export default app;

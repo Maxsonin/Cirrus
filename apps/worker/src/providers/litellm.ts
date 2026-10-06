@@ -1,27 +1,27 @@
-import { env } from '../config/env.js';
-import type { ModelId } from '../config/models.js';
-import { findModelById } from '../services/model.service.js';
+import {
+  models,
+  type AiRequest,
+  type ModelId,
+  type Model,
+} from '@cirrus/shared';
 
-export type AiInput = {
-  role: 'user' | 'assistant' | 'system' | 'developer';
-  content: string;
-};
+import { env } from '../config/env';
 
-export type AiRequest = {
-  model: ModelId;
-  input: AiInput[];
-  think: boolean;
-};
+function findModelById(modelId: ModelId): Model {
+  const model = models.find((model) => model.id === modelId);
+
+  if (!model) {
+    throw new Error(`Unknown model: ${modelId}`);
+  }
+
+  return model;
+}
 
 export async function createResponseStream(
   request: AiRequest,
   signal: AbortSignal,
-): Promise<Response> {
+): Promise<ReadableStream<Uint8Array>> {
   const model = findModelById(request.model);
-
-  if (!model) {
-    throw new Error(`Unknown model: ${request.model}`);
-  }
 
   if (request.think && !model.thinking.supported) {
     throw new Error(`Model "${model.id}" does not support thinking`);
@@ -38,7 +38,7 @@ export async function createResponseStream(
       input: request.input,
       stream: true,
       reasoning: {
-        effort: request.think ? 'medium' : 'none',
+        effort: request.think ? 'medium' : 'none', // TODO: make user choose effort
       },
     }),
     signal,
@@ -56,5 +56,5 @@ export async function createResponseStream(
     throw new Error('LiteLLM error: ' + error);
   }
 
-  return response;
+  return response.body;
 }

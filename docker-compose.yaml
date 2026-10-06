@@ -1,4 +1,12 @@
 services:
+  redis:
+    image: redis:8
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    command: ['redis-server', '--appendonly', 'yes']
+
   litellm:
     image: ghcr.io/berriai/litellm:v1.98.0
     ports:
@@ -6,3 +14,6 @@ services:
     volumes:
       - ./litellm_config.yaml:/app/config.yaml:ro
     command: ['--config', '/app/config.yaml']
+
+volumes:
+  redis-data:
