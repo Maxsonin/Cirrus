@@ -1,20 +1,15 @@
 {
-  "name": "chatbot",
+  "name": "cirrus",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
+  "scripts": {},
+  "author": "https://github.com/Maxsonin",
   "license": "ISC",
+  "type": "module",
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
       "version": "12.4.2",
       "onFail": "download"
     }
-  },
-  "type": "module"
+  }
 }
