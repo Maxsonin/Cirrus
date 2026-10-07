@@ -1,4 +1,8 @@
-import { DONE_SIGNAL, type StreamEventType } from '@cirrus/shared';
+import {
+  DONE_SIGNAL,
+  type ChatStreamEvent,
+  type GenerationStreamEventType,
+} from '@cirrus/shared';
 
 import type { RedisClient } from '../../infra/redis';
 
@@ -7,17 +11,23 @@ type PublisherOptions = {
   maxSize: number;
 };
 
+const STREAM_TTL_SECONDS = 180;
+
 export function createStreamPublisher(
   client: RedisClient,
   streamKey: string,
   { intervalMs, maxSize }: PublisherOptions,
 ) {
-  let type: StreamEventType | null = null;
+  let type: GenerationStreamEventType | null = null;
   let buffer = '';
   let lastFlushAt = Date.now();
 
-  const add = (event: string, data: string) =>
-    client.xAdd(streamKey, '*', { event, data });
+  const add = (event: ChatStreamEvent, data: string) =>
+    client
+      .multi()
+      .xAdd(streamKey, '*', { event, data })
+      .expire(streamKey, STREAM_TTL_SECONDS)
+      .exec();
 
   const flush = async () => {
     if (type && buffer) {
@@ -29,7 +39,7 @@ export function createStreamPublisher(
   };
 
   return {
-    async append(nextType: StreamEventType, value: string) {
+    async append(nextType: GenerationStreamEventType, value: string) {
       if (nextType !== type) {
         await flush();
         type = nextType;

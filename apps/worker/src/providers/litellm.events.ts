@@ -1,4 +1,4 @@
-import type { StreamEventType } from '@cirrus/shared';
+import type { GenerationStreamEventType } from '@cirrus/shared';
 
 type ProviderEvent = {
   type?: string;
@@ -6,11 +6,11 @@ type ProviderEvent = {
 };
 
 export type StreamEvent = {
-  type: StreamEventType;
+  type: GenerationStreamEventType;
   value: string;
 };
 
-const EVENT_TYPE_MAP: Record<string, StreamEventType> = {
+const EVENT_TYPE_MAP: Record<string, GenerationStreamEventType> = {
   'response.output_text.delta': 'delta',
   'response.reasoning_summary_text.delta': 'thinking',
 };

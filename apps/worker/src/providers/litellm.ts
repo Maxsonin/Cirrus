@@ -6,6 +6,7 @@ import {
 } from '@cirrus/shared';
 
 import { env } from '../config/env';
+import { parseProviderEvent, type StreamEvent } from './litellm.events';
 
 function findModelById(modelId: ModelId): Model {
   const model = models.find((model) => model.id === modelId);
@@ -17,10 +18,30 @@ function findModelById(modelId: ModelId): Model {
   return model;
 }
 
-export async function createResponseStream(
+async function* readSseData(
+  body: ReadableStream<Uint8Array>,
+): AsyncGenerator<string> {
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  for await (const chunk of body) {
+    buffer += decoder.decode(chunk, { stream: true });
+
+    const events = buffer.split(/\r?\n\r?\n/);
+    buffer = events.pop() ?? '';
+
+    for (const event of events) {
+      if (event.startsWith('data:')) {
+        yield event.slice(5).trimStart();
+      }
+    }
+  }
+}
+
+export async function* streamResponse(
   request: AiRequest,
   signal: AbortSignal,
-): Promise<ReadableStream<Uint8Array>> {
+): AsyncGenerator<StreamEvent> {
   const model = findModelById(request.model);
 
   if (request.think && !model.thinking.supported) {
@@ -56,5 +77,11 @@ export async function createResponseStream(
     throw new Error('LiteLLM error: ' + error);
   }
 
-  return response.body;
+  for await (const data of readSseData(response.body)) {
+    const event = parseProviderEvent(data);
+
+    if (event) {
+      yield event;
+    }
+  }
 }

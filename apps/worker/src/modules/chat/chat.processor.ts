@@ -6,9 +6,7 @@ import {
 } from '@cirrus/shared';
 
 import type { RedisClient } from '../../infra/redis';
-import { readSseData } from '../../lib/sse';
-import { createResponseStream } from '../../providers/litellm';
-import { parseProviderEvent } from '../../providers/litellm.events';
+import { streamResponse } from '../../providers/litellm';
 import { createAbortSubscriber } from './chat.abort';
 import { createStreamPublisher } from './chat.publisher';
 
@@ -43,14 +41,8 @@ export function createChatProcessor({
     );
 
     try {
-      const body = await createResponseStream(request, abort.signal);
-
-      for await (const data of readSseData(body)) {
-        const event = parseProviderEvent(data);
-
-        if (event) {
-          await publisher.append(event.type, event.value);
-        }
+      for await (const event of streamResponse(request, abort.signal)) {
+        await publisher.append(event.type, event.value);
       }
 
       await publisher.done();

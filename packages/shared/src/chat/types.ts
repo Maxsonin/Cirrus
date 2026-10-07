@@ -16,4 +16,6 @@ export type ChatJobData = {
   request: AiRequest;
 };
 
-export type StreamEventType = 'delta' | 'thinking';
+export type GenerationStreamEventType = 'delta' | 'thinking';
+
+export type ChatStreamEvent = GenerationStreamEventType | 'done' | 'error';
