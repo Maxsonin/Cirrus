@@ -1,14 +1,17 @@
 import type { Request, Response } from 'express';
 import { randomUUID } from 'node:crypto';
 
-import { chatStreamKey, type AiRequest } from '@cirrus/shared';
+import { chatStreamKey, type ChatRequest } from '@cirrus/shared';
 
 import { streamPool } from '../../infra/redis';
 import { openSse, writeSse } from '../../lib/sse';
 import { readChatStream } from './chat.consumer';
 import { abortChat, enqueueChat } from './chat.service';
 
-export async function chatController(req: Request, res: Response) {
+export async function stream(
+  req: Request<unknown, unknown, ChatRequest>,
+  res: Response,
+) {
   const requestId = randomUUID();
   const abort = new AbortController();
 
@@ -23,13 +26,11 @@ export async function chatController(req: Request, res: Response) {
     });
   });
 
+  await enqueueChat(requestId, req.body);
+
+  openSse(res);
+
   try {
-    const request = req.body as AiRequest; // TODO: add Zod middleware for validation and prevent incorrect models from starting a job in worker
-
-    await enqueueChat(requestId, request);
-
-    openSse(res);
-
     for await (const { event, data } of readChatStream(
       streamPool,
       chatStreamKey(requestId),
@@ -39,18 +40,14 @@ export async function chatController(req: Request, res: Response) {
     }
   } catch (error) {
     console.error(error);
-
-    if (!res.headersSent) {
-      res.status(500).json({
-        error: 'Something went wrong',
-      });
-      return;
-    }
-
-    writeSse(res, 'error', JSON.stringify({ message: 'Something went wrong' }));
-  } finally {
-    if (!res.writableEnded) {
-      res.end();
-    }
+    writeSse(
+      res,
+      'error',
+      JSON.stringify({
+        message: 'Something went wrong while generating your response',
+      }),
+    );
   }
+
+  res.end();
 }

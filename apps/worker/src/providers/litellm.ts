@@ -1,6 +1,6 @@
 import {
   models,
-  type AiRequest,
+  type ChatRequest,
   type ModelId,
   type Model,
 } from '@cirrus/shared';
@@ -39,7 +39,7 @@ async function* readSseData(
 }
 
 export async function* streamResponse(
-  request: AiRequest,
+  request: ChatRequest,
   signal: AbortSignal,
 ): AsyncGenerator<StreamEvent> {
   const model = findModelById(request.model);

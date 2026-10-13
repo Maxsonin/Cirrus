@@ -21,3 +21,13 @@ export const models = [
 
 export type Model = (typeof models)[number];
 export type ModelId = Model['id'];
+
+export const modelIds = models.map((m) => m.id) as [ModelId, ...ModelId[]];
+
+export function getModel(id: ModelId): Model {
+  return models.find((m) => m.id === id)!;
+}
+
+export function supportsThinking(id: ModelId): boolean {
+  return getModel(id).thinking.supported;
+}

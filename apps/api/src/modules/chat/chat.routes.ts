@@ -1,8 +1,12 @@
 import { Router } from 'express';
-import { chatController } from './chat.controller';
+
+import { chatRequestSchema } from '@cirrus/shared';
+
+import { validateBody } from '../../lib/validate';
+import * as chat from './chat.controller';
 
 const router = Router();
 
-router.post('/chat', chatController);
+router.post('/chat', validateBody(chatRequestSchema), chat.stream);
 
 export default router;
