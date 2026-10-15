@@ -3,6 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+import AuthForm from './components/AuthForm';
+import { authClient } from './lib/auth-client';
+
 type Message = {
   role: 'user' | 'assistant';
   content: string;
@@ -19,6 +22,50 @@ type Model = {
 const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
+  const { data: session } = authClient.useSession();
+  const [showAuth, setShowAuth] = useState(false);
+
+  return (
+    <div className="flex h-screen">
+      <aside className="flex w-60 flex-col border-r border-gray-300 p-3">
+        <div className="flex-1" />
+        {session ? (
+          <div className="flex items-center justify-between gap-2">
+            <span className="truncate">{session.user.name}</span>
+            <button onClick={() => authClient.signOut()}>Sign out</button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowAuth(true)}
+            className="border border-gray-600 p-1"
+          >
+            Sign up
+          </button>
+        )}
+      </aside>
+
+      <main className="flex-1 overflow-y-auto p-4">
+        <Chat />
+      </main>
+
+      {showAuth && !session && (
+        <div
+          className="fixed inset-0 bg-black/40"
+          onClick={() => setShowAuth(false)}
+        >
+          <div
+            className="mx-auto mt-20 w-80 bg-white p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <AuthForm />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Chat() {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -31,7 +78,7 @@ function App() {
   const controllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/models`)
+    fetch(`${API_URL}/models`, { credentials: 'include' })
       .then((res) => res.json())
       .then((data: Model[]) => {
         setModels(data);
@@ -76,6 +123,7 @@ function App() {
     try {
       const response = await fetch(`${API_URL}/chat`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           Accept: 'text/event-stream',

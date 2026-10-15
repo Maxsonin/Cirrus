@@ -17,6 +17,7 @@ function createRedisClient(label: string) {
 
 export const queueRedis = createRedisClient('queue');
 export const pubsubPublisher = createRedisClient('pubsub publisher');
+export const authRedis = createRedisClient('auth');
 
 export const streamPool = createClientPool({
   url: env.redisUrl,
@@ -30,7 +31,7 @@ export type StreamPool = typeof streamPool;
 
 export const bullmqConnection = createNodeRedisClient(queueRedis);
 
-const clients = [queueRedis, pubsubPublisher];
+const clients = [queueRedis, pubsubPublisher, authRedis];
 
 export async function connectRedis() {
   for (const client of clients) {

@@ -3,7 +3,7 @@ import type { ChatStreamEvent } from '@cirrus/shared';
 import type { StreamPool } from '../../infra/redis';
 
 const BLOCK_MS = 1000;
-const IDLE_TIMEOUT_MS = 180_000;
+const IDLE_TIMEOUT_MS = 30_000;
 
 export type ChatStreamMessage = {
   event: ChatStreamEvent;
@@ -28,7 +28,9 @@ export async function* readChatStream(
         if (Date.now() - lastMessageAt >= IDLE_TIMEOUT_MS) {
           yield {
             event: 'error',
-            data: JSON.stringify({ message: 'Generation timed out' }),
+            data: JSON.stringify({
+              message: 'Generation timed out. Please try again later.',
+            }),
           };
           return;
         }
