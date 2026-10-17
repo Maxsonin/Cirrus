@@ -12,10 +12,15 @@ export function openSse(res: Response) {
     .flushHeaders();
 }
 
-export function writeSse(res: Response, event: ChatStreamEvent, data: string) {
+export function writeSse(
+  res: Response,
+  event: ChatStreamEvent | 'chat',
+  data: string | object,
+) {
+  const payload = typeof data === 'string' ? data : JSON.stringify(data);
   if (event === 'done') {
     res.write(`data: ${DONE_SIGNAL}\n\n`);
   } else {
-    res.write(`event: ${event}\ndata: ${data}\n\n`);
+    res.write(`event: ${event}\ndata: ${payload}\n\n`);
   }
 }

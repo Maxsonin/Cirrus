@@ -1,6 +1,5 @@
-import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../generated/prisma/client';
+import { createPrisma } from '@cirrus/db';
+
 import { env } from '../config/env';
 
-const adapter = new PrismaPg({ connectionString: env.databaseUrl });
-export const prisma = new PrismaClient({ adapter });
+export const prisma = createPrisma(env.databaseUrl);

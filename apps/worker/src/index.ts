@@ -1,3 +1,4 @@
+import { prisma } from './infra/prisma';
 import { connectRedis, disconnectRedis } from './infra/redis';
 import { startChatWorker } from './modules/chat/chat.worker';
 
@@ -21,6 +22,7 @@ console.log(`Worker started: ${workerType}`);
 async function shutdown() {
   await worker.close();
   await disconnectRedis();
+  await prisma.$disconnect();
   process.exit(0);
 }
 

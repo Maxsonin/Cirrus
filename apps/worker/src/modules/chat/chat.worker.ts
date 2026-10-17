@@ -7,12 +7,14 @@ import {
   pubsubSubscriber,
   streamRedis,
 } from '../../infra/redis';
+import { prisma } from '../../infra/prisma';
 import { createChatProcessor } from './chat.processor';
 
 export function startChatWorker() {
   const processChatJob = createChatProcessor({
     streamClient: streamRedis,
     pubsubSubscriber,
+    prisma,
   });
 
   const worker = new Worker<ChatJobData>(CHAT_QUEUE, processChatJob, {

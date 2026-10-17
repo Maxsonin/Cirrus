@@ -1,0 +1,25 @@
+{
+  "name": "@cirrus/db",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./chat": "./src/chat.ts"
+  },
+  "scripts": {
+    "generate": "pnpm exec prisma generate",
+    "migrate": "pnpm exec prisma migrate dev"
+  },
+  "dependencies": {
+    "@cirrus/shared": "workspace:*",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "dotenv": "^18.0.2",
+    "prisma": "^7.10.0"
+  }
+}

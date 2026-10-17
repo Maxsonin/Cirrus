@@ -1,8 +1,16 @@
-import type { ChatRequest } from './schemas';
+import type { ModelId } from '../models';
+import type { ModelMessage } from './messages';
+
+export type GenerationRequest = {
+  model: ModelId;
+  think: boolean;
+  input: ModelMessage[];
+};
 
 export type ChatJobData = {
   requestId: string;
-  request: ChatRequest;
+  chatId: string | null; // null for stateless chats: nothing is persisted
+  request: GenerationRequest;
 };
 
 export type GenerationStreamEventType = 'delta' | 'thinking';

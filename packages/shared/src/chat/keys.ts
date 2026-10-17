@@ -10,3 +10,7 @@ export function chatStreamKey(requestId: string) {
 export function chatAbortChannel(requestId: string) {
   return `${chatStreamKey(requestId)}:abort`;
 }
+
+export function chatActiveKey(chatId: string) {
+  return `chat:active:${chatId}`;
+}

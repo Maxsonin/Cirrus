@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cirrus/shared": "workspace:*",
     "@tailwindcss/vite": "^4.3.3",
     "better-auth": "^1.7.7",
     "react": "^19.2.8",

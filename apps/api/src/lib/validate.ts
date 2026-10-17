@@ -7,3 +7,13 @@ export const validateBody =
     req.body = schema.parse(req.body);
     next();
   };
+
+export const validateQuery =
+  (schema: ZodType): RequestHandler =>
+  (req, res, next) => {
+    Object.defineProperty(req, 'query', {
+      value: schema.parse(req.query),
+      writable: true,
+    });
+    next();
+  };

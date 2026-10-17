@@ -1,12 +1,39 @@
 import { Router } from 'express';
 
-import { chatRequestSchema } from '@cirrus/shared';
+import {
+  chatMessagesQuerySchema,
+  chatRequestSchema,
+  listChatsQuerySchema,
+} from '@cirrus/shared';
 
-import { validateBody } from '../../lib/validate';
-import * as chat from './chat.controller';
+import { loadSession, requireUser } from '../../lib/session';
+import { validateBody, validateQuery } from '../../lib/validate';
+
+import * as chatController from './chat.controller';
 
 const router = Router();
 
-router.post('/chat', validateBody(chatRequestSchema), chat.stream);
+router.post(
+  '/chat',
+  loadSession,
+  validateBody(chatRequestSchema),
+  chatController.stream,
+);
+
+router.get(
+  '/chats',
+  requireUser,
+  validateQuery(listChatsQuerySchema),
+  chatController.list,
+);
+router.get(
+  '/chats/:id/messages',
+  requireUser,
+  validateQuery(chatMessagesQuerySchema),
+  chatController.messages,
+);
+router.get('/chats/:id/stream', requireUser, chatController.resume);
+router.post('/chats/:id/abort', requireUser, chatController.abort);
+router.delete('/chats/:id', requireUser, chatController.remove);
 
 export default router;
