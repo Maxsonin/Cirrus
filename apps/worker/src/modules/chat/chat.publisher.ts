@@ -1,23 +1,18 @@
 import {
   DONE_SIGNAL,
+  STREAM_TTL_SECONDS,
   type ChatStreamEvent,
   type GenerationStreamEventType,
 } from '@cirrus/shared';
 
 import type { RedisClient } from '../../infra/redis';
 
-type PublisherOptions = {
-  intervalMs: number;
-  maxSize: number;
-};
+const FLUSH_INTERVAL_MS = 500;
+const FLUSH_MAX_CHARS = 1024;
 
-const STREAM_TTL_SECONDS = 180;
+export type StreamPublisher = ReturnType<typeof createStreamPublisher>;
 
-export function createStreamPublisher(
-  client: RedisClient,
-  streamKey: string,
-  { intervalMs, maxSize }: PublisherOptions,
-) {
+export function createStreamPublisher(client: RedisClient, streamKey: string) {
   let type: GenerationStreamEventType | null = null;
   let buffer = '';
   let lastFlushAt = Date.now();
@@ -47,7 +42,10 @@ export function createStreamPublisher(
 
       buffer += value;
 
-      if (buffer.length >= maxSize || Date.now() - lastFlushAt >= intervalMs) {
+      if (
+        buffer.length >= FLUSH_MAX_CHARS ||
+        Date.now() - lastFlushAt >= FLUSH_INTERVAL_MS
+      ) {
         await flush();
       }
     },

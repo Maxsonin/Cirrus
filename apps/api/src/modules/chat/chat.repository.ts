@@ -1,4 +1,4 @@
-import { appendChatMessage } from '@cirrus/db/chat';
+import { appendChatMessageAndGetHistory } from '@cirrus/db';
 import type { ChatMessage } from '@cirrus/shared';
 
 import { prisma } from '../../infra/prisma';
@@ -27,20 +27,10 @@ export function getChat(userId: string, id: string) {
   });
 }
 
-export async function getAllMessages(id: string) {
-  const chat = await prisma.chat.findUnique({
-    where: { id },
-    select: { messages: true },
+export function appendMessage(id: string, message: ChatMessage) {
+  return appendChatMessageAndGetHistory(prisma, id, message, {
+    unread: false,
   });
-  return (chat?.messages ?? []) as unknown as ChatMessage[];
-}
-
-export function appendMessage(
-  id: string,
-  message: ChatMessage,
-  unread: boolean,
-) {
-  return appendChatMessage(prisma, id, message, unread);
 }
 
 export async function listChats(userId: string, cursor?: string) {
@@ -58,7 +48,6 @@ export async function listChats(userId: string, cursor?: string) {
   return { chats: page, nextCursor: hasMore ? page.at(-1)!.id : null };
 }
 
-// Messages are append-only, so a 1-based position is a stable cursor.
 export async function getMessages(
   userId: string,
   id: string,
@@ -84,8 +73,8 @@ export async function getMessages(
   };
 }
 
-// Raw SQL so `updatedAt` doesn't change and the chat keeps its list position.
 export function markRead(userId: string, id: string) {
+  // Raw SQL so `updatedAt` doesn't change and the chat keeps its list position.
   return prisma.$executeRaw`
     UPDATE "chat" SET "unread" = false
     WHERE "id" = ${id} AND "userId" = ${userId} AND "unread"

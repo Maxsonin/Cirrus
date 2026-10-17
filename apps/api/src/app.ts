@@ -2,17 +2,19 @@ import express, { type Express } from 'express';
 import cors from 'cors';
 import { toNodeHandler } from 'better-auth/node';
 
+import { auth } from './auth/auth';
 import { env } from './config/env';
-import { auth } from './lib/auth';
-import { errorHandler } from './lib/error-handler';
+import { errorHandler } from './http/error-handler';
 import chatRouter from './modules/chat/chat.routes';
 import modelsRouter from './modules/models/models.routes';
 
 const app: Express = express();
 
+app.disable('x-powered-by');
+
 app.use(
   cors({
-    origin: env.frontendOrigin,
+    origin: env.FRONTEND_ORIGIN,
     credentials: true,
   }),
 );

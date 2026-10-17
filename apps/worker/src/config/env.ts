@@ -1,10 +1,13 @@
 import 'dotenv/config';
+import { z } from 'zod';
+import { loadEnv } from '@cirrus/shared/env';
 
-export const env = {
-  nodeEnv: process.env.NODE_ENV ?? 'development',
-  liteLlmUrl: process.env.LITELLM_URL ?? 'http://localhost:4000',
-  redisUrl: process.env.REDIS_URL ?? 'redis://localhost:6379',
-  databaseUrl:
-    process.env.DATABASE_URL ?? 'postgresql://postgres@localhost:5432',
-  chatConcurrency: Number(process.env.CHAT_CONCURRENCY ?? 10),
-} as const;
+export const env = loadEnv(
+  {
+    LITELLM_URL: z.url().default('http://localhost:4000'),
+    REDIS_URL: z.url().default('redis://localhost:6379'),
+    DATABASE_URL: z.url().default('postgresql://postgres@localhost:5432'),
+    CHAT_CONCURRENCY: z.coerce.number().int().positive().default(10),
+  },
+  process.env,
+);

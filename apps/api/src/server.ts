@@ -1,18 +1,20 @@
 import app from './app';
 import { env } from './config/env';
+import { prisma } from './infra/prisma';
 import { connectRedis, disconnectRedis } from './infra/redis';
-import { chatQueue } from './modules/chat/chat.queue';
+import { generationQueue } from './modules/generation/generation.queue';
 
 await connectRedis();
 
-const server = app.listen(env.port, () => {
-  console.log(`Server running on http://localhost:${env.port}`);
+const server = app.listen(env.PORT, () => {
+  console.log(`Server running on http://localhost:${env.PORT}`);
 });
 
 async function shutdown() {
   server.close();
-  await chatQueue.close();
+  await generationQueue.close();
   await disconnectRedis();
+  await prisma.$disconnect();
   process.exit(0);
 }
 

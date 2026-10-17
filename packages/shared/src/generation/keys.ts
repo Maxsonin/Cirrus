@@ -1,7 +1,4 @@
-export const CHAT_QUEUE = 'chat';
-
-export const ABORT_SIGNAL = '[ABORT]';
-export const DONE_SIGNAL = '[DONE]';
+export const STREAM_TTL_SECONDS = 45;
 
 export function chatStreamKey(requestId: string) {
   return `chat:${requestId}`;

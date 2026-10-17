@@ -4,8 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts",
-    "./chat": "./src/chat.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "generate": "pnpm exec prisma generate",

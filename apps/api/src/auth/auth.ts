@@ -1,9 +1,10 @@
 import { betterAuth } from 'better-auth/minimal';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { prisma } from '../infra/prisma';
-import { authRedis } from '../infra/redis';
+
 import { env } from '../config/env';
-import { sendEmail } from './email';
+import { sendEmail } from '../infra/email';
+import { prisma } from '../infra/prisma';
+import { redis } from '../infra/redis';
 
 const PREFIX = 'auth:';
 
@@ -12,15 +13,15 @@ export const auth = betterAuth({
     provider: 'postgresql',
   }),
   secondaryStorage: {
-    get: async (key) => await authRedis.get(PREFIX + key),
+    get: async (key) => await redis.get(PREFIX + key),
     set: async (key, value, ttl) =>
-      await authRedis.set(PREFIX + key, value, { EX: ttl }),
+      await redis.set(PREFIX + key, value, { EX: ttl }),
     delete: async (key) => {
-      await authRedis.del(PREFIX + key);
+      await redis.del(PREFIX + key);
     },
-    getAndDelete: (key) => authRedis.getDel(PREFIX + key),
+    getAndDelete: (key) => redis.getDel(PREFIX + key),
     increment: async (key, ttl) => {
-      const [count] = await authRedis
+      const [count] = await redis
         .multi()
         .incr(PREFIX + key)
         .expire(PREFIX + key, ttl, 'NX')
@@ -33,9 +34,9 @@ export const auth = betterAuth({
     storage: 'secondary-storage',
   },
 
-  baseURL: env.baseURL,
-  secret: env.betterAuthSecret,
-  trustedOrigins: [env.frontendOrigin],
+  baseURL: env.BETTER_AUTH_URL,
+  secret: env.BETTER_AUTH_SECRET,
+  trustedOrigins: [env.FRONTEND_ORIGIN],
 
   emailAndPassword: {
     enabled: true,
@@ -44,8 +45,8 @@ export const auth = betterAuth({
   socialProviders: {
     google: {
       prompt: 'select_account',
-      clientId: [env.googleWebClientId],
-      clientSecret: env.googleClientSecret,
+      clientId: [env.GOOGLE_WEB_CLIENT_ID],
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
 

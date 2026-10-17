@@ -1,7 +1,20 @@
 import { z } from 'zod';
 
 import { modelIds, supportsThinking } from '../models';
-import { inputMessageSchema } from './messages';
+
+export const ANON_MESSAGE_LIMIT = 15;
+
+const textPartSchema = z.object({
+  type: z.literal('text'),
+  text: z.string().min(1),
+});
+
+export const inputMessageSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  parts: z.array(textPartSchema).min(1),
+});
+
+export type InputMessage = z.infer<typeof inputMessageSchema>;
 
 export const chatRequestSchema = z
   .object({
@@ -22,9 +35,13 @@ export const chatRequestSchema = z
 
 export type ChatRequest = z.infer<typeof chatRequestSchema>;
 
-export const listChatsQuerySchema = z.object({ cursor: z.string().optional() });
+export const listChatsQuerySchema = z.object({ cursor: z.uuid().optional() });
 
 export type ListChatsQuery = z.infer<typeof listChatsQuerySchema>;
+
+export const chatParamsSchema = z.object({ id: z.uuid() });
+
+export type ChatParams = z.infer<typeof chatParamsSchema>;
 
 export const chatMessagesQuerySchema = z.object({
   before: z.coerce.number().int().positive().optional(),

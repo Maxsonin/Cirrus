@@ -1,9 +1,9 @@
 import { Queue } from 'bullmq';
-import { CHAT_QUEUE } from '@cirrus/shared';
+import { CHAT_QUEUE, type ChatJobData } from '@cirrus/shared';
 
 import { bullmqConnection } from '../../infra/redis';
 
-export const chatQueue = new Queue(CHAT_QUEUE, {
+export const generationQueue = new Queue<ChatJobData>(CHAT_QUEUE, {
   connection: bullmqConnection,
   defaultJobOptions: {
     attempts: 1, // A retry would duplicate already-sent deltas.

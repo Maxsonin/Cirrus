@@ -25,7 +25,9 @@ export type ModelId = Model['id'];
 export const modelIds = models.map((m) => m.id) as [ModelId, ...ModelId[]];
 
 export function getModel(id: ModelId): Model {
-  return models.find((m) => m.id === id)!;
+  const model = models.find((m) => m.id === id);
+  if (!model) throw new Error(`Unknown model: ${id}`);
+  return model;
 }
 
 export function supportsThinking(id: ModelId): boolean {

@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev:chat": "tsx watch src/index.ts chat"
+    "dev:chat": "tsx watch src/index.ts chat",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "@cirrus/shared": "workspace:*",
     "bullmq": "^6.3.10",
     "dotenv": "^18.0.5",
-    "redis": "^6.3.0"
+    "redis": "^6.3.0",
+    "zod": "^4.6.6"
   }
 }

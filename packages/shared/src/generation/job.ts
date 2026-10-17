@@ -1,5 +1,11 @@
 import type { ModelId } from '../models';
-import type { ModelMessage } from './messages';
+
+export const CHAT_QUEUE = 'chat';
+
+export type ModelMessage = {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+};
 
 export type GenerationRequest = {
   model: ModelId;
@@ -12,7 +18,3 @@ export type ChatJobData = {
   chatId: string | null; // null for stateless chats: nothing is persisted
   request: GenerationRequest;
 };
-
-export type GenerationStreamEventType = 'delta' | 'thinking';
-
-export type ChatStreamEvent = GenerationStreamEventType | 'done' | 'error';

@@ -6,9 +6,15 @@ const workers = {
   chat: startChatWorker,
 } as const;
 
-const workerType = process.argv[2] as keyof typeof workers | undefined;
+type WorkerType = keyof typeof workers;
 
-if (!workerType || !(workerType in workers)) {
+function isWorkerType(value: string | undefined): value is WorkerType {
+  return value !== undefined && Object.hasOwn(workers, value);
+}
+
+const workerType = process.argv[2];
+
+if (!isWorkerType(workerType)) {
   console.error(`Unknown worker: ${workerType}`);
   process.exit(1);
 }
