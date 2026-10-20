@@ -9,7 +9,7 @@ import { redis } from '../../infra/redis';
 import { generationQueue } from './generation.queue';
 import { endGenerationStream } from './generation.stream';
 
-const LOCK_TTL_SECONDS = 600;
+const LOCK_TTL_SECONDS = 600; // TODO: think of a better solution
 
 export async function startGeneration(data: ChatJobData) {
   await generationQueue.add('generate', data, { jobId: data.requestId });
