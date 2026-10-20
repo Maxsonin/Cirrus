@@ -65,7 +65,7 @@ export async function submitPersistentChat(userId: string, body: ChatRequest) {
   if (!(await lockChat(chat.id, requestId))) {
     throw new HttpError(
       409,
-      'A response generation is already in progress. Check other opened instances or this conversation.',
+      'A response generation is already in progress. Check other opened instances of this conversation.',
     );
   }
 
