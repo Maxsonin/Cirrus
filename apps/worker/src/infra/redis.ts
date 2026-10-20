@@ -3,11 +3,11 @@ import { createNodeRedisClient } from 'bullmq';
 
 import { env } from '../config/env';
 
-function createRedisClient(label: string) {
-  const client = createClient({ url: env.REDIS_URL });
+function createRedisClient(name: string) {
+  const client = createClient({ url: env.REDIS_URL, name });
 
   client.on('error', (error) => {
-    console.error(`Redis ${label} error:`, error);
+    console.error(`Redis ${name} error:`, error);
   });
 
   return client;
@@ -15,10 +15,10 @@ function createRedisClient(label: string) {
 
 export type RedisClient = ReturnType<typeof createRedisClient>;
 
-export const redis = createRedisClient('main');
-export const subscriber = createRedisClient('subscriber');
+export const redis = createRedisClient('worker:main');
+export const subscriber = createRedisClient('worker:subscriber');
 
-export const queueRedis = createRedisClient('queue');
+export const queueRedis = createRedisClient('worker:queue');
 export const bullmqConnection = createNodeRedisClient(queueRedis);
 
 const clients = [redis, queueRedis, subscriber];

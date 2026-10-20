@@ -3,25 +3,28 @@ import { createNodeRedisClient } from 'bullmq';
 
 import { env } from '../config/env';
 
-function createRedisClient(label: string) {
-  const client = createClient({ url: env.REDIS_URL });
+function createRedisClient(name: string) {
+  const client = createClient({ url: env.REDIS_URL, name });
 
   client.on('error', (error) => {
-    console.error(`Redis ${label} error:`, error);
+    console.error(`Redis ${name} error:`, error);
   });
 
   return client;
 }
 
-export const redis = createRedisClient('main');
+export const redis = createRedisClient('api:main');
 
-export const queueRedis = createRedisClient('queue');
+export const queueRedis = createRedisClient('api:queue');
 export const bullmqConnection = createNodeRedisClient(queueRedis);
 
-export const streamReaderPool = createClientPool({ url: env.REDIS_URL });
+export const streamReaderPool = createClientPool({
+  url: env.REDIS_URL,
+  name: 'api:stream-reader',
+});
 
 streamReaderPool.on('error', (error) => {
-  console.error('Redis stream reader pool error:', error);
+  console.error('Redis api:stream-reader error:', error);
 });
 
 const clients = [redis, queueRedis];
