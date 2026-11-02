@@ -10,3 +10,20 @@ export type ChatMessage = {
   model?: string; // assistant only
   createdAt: string;
 };
+
+export type ChatSummary = {
+  id: string;
+  title: string;
+  unread: boolean;
+  generating: boolean;
+};
+
+export type ChatsPage = {
+  chats: ChatSummary[];
+  nextCursor: string | null;
+};
+
+export type MessagesPage = {
+  messages: ChatMessage[];
+  nextCursor: number | null;
+};

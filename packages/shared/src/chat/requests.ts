@@ -35,6 +35,9 @@ export const chatRequestSchema = z
 
 export type ChatRequest = z.infer<typeof chatRequestSchema>;
 
+/** Request body as the client sends it (before schema defaults apply). */
+export type ChatRequestBody = z.input<typeof chatRequestSchema>;
+
 export const listChatsQuerySchema = z.object({ cursor: z.uuid().optional() });
 
 export type ListChatsQuery = z.infer<typeof listChatsQuerySchema>;

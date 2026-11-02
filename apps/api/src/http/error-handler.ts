@@ -15,7 +15,8 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   }
 
   if (err instanceof ZodError) {
-    res.status(400).json({ error: 'Invalid request', issues: err.issues });
+    console.warn(err.issues);
+    res.status(400).json({ error: 'Invalid request' });
     return;
   }
 

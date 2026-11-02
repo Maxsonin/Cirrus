@@ -3,6 +3,12 @@ import { getModel, type GenerationRequest } from '@cirrus/shared';
 import { env } from '../config/env';
 import { readSseData } from '../lib/sse';
 import { parseProviderEvent, type StreamEvent } from './litellm.events';
+import { readFileSync } from 'node:fs';
+
+export const SYSTEM_PROMPT = readFileSync(
+  new URL('./system-prompt.md', import.meta.url),
+  'utf8',
+).trim();
 
 export async function* streamResponse(
   request: GenerationRequest,
@@ -22,7 +28,7 @@ export async function* streamResponse(
     },
     body: JSON.stringify({
       model: model.id,
-      input: request.input,
+      input: [{ role: 'system', content: SYSTEM_PROMPT }, ...request.input],
       stream: true,
       reasoning: {
         effort: request.think ? 'medium' : 'none', // TODO: make user choose effort

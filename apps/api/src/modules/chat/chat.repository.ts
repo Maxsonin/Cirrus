@@ -39,7 +39,7 @@ export async function listChats(userId: string, cursor?: string) {
     orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
     take: LIST_LIMIT + 1,
     ...(cursor && { cursor: { id: cursor }, skip: 1 }),
-    select: { id: true, title: true, unread: true, updatedAt: true },
+    select: { id: true, title: true, unread: true },
   });
 
   const hasMore = chats.length > LIST_LIMIT;

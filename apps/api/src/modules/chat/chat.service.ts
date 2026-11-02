@@ -3,7 +3,9 @@ import { randomUUID } from 'node:crypto';
 import {
   ANON_MESSAGE_LIMIT,
   type ChatRequest,
+  type ChatsPage,
   type GenerationRequest,
+  type MessagesPage,
 } from '@cirrus/shared';
 
 import { HttpError } from '../../http/http-error';
@@ -88,7 +90,10 @@ export async function submitPersistentChat(userId: string, body: ChatRequest) {
   return { chat, requestId };
 }
 
-export async function listChats(userId: string, cursor?: string) {
+export async function listChats(
+  userId: string,
+  cursor?: string,
+): Promise<ChatsPage> {
   const page = await repo.listChats(userId, cursor);
   const generating = await getGeneratingChatIds(page.chats.map((c) => c.id));
 
@@ -105,7 +110,7 @@ export async function getMessages(
   userId: string,
   chatId: string,
   before: number | null,
-) {
+): Promise<MessagesPage> {
   const [, page] = await Promise.all([
     assertChatOwner(userId, chatId),
     repo.getMessages(userId, chatId, before, MESSAGES_LIMIT),
